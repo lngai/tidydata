@@ -1,4 +1,8 @@
-# Read the source Files
+
+#load the library (dplyr)
+library(dplyr)
+
+# Section 1: Read the source Files
 
 X_Train_data<-read.table("train/X_train.txt",header=FALSE,sep="")
 X_Test_data<-read.table("test/X_test.txt",header=FALSE,sep="")
@@ -9,7 +13,7 @@ sub_test<-read.table("test/subject_test.txt",header=FALSE,sep="")
 activity_labels<-read.table("activity_labels.txt",header=FALSE,sep="")
 
 
-#Read the Column Name of each Measurement
+# Section 2: Read the Column Name of each Measurement
 feature<-read.table("features.txt",header=FALSE,sep="")
 featureslist<-feature$V2
 featureslist<-make.unique(as.character(featureslist))
@@ -23,7 +27,7 @@ colnames(sub_train)<-"subject"
 colnames(sub_test)<-"subject"
 
 
-#Merge the data rows
+#Section 3: Merge the data rows
 X_Comb_data<-rbind(X_Train_data,X_Test_data)
 y_Comb_data<-rbind(y_Train_data,y_Test_data)
 sub_Comb_data<-rbind(sub_train,sub_test)
@@ -31,10 +35,10 @@ sub_Comb_data<-rbind(sub_train,sub_test)
 #Merge the data colums
 full_com_data<-cbind(sub_Comb_data,y_Comb_data,X_Comb_data)
 
-#Extract the Measurement with Means and Standard Deviation
-full_extract<-select(full_com_data,subject,activity,matches(".(mean()|std())"))
+#Section 4: Extract the Measurement with Means and Standard Deviation
+full_extract<-select(full_com_data,subject,activity,matches(".(-mean()|-std())"))
 
-# Replace the Activity Code with the Activity Description
+# Section 5: Replace the Activity Code with the Activity Description
 mgsub <- function(pattern, replacement, x, ...) {
   if (length(pattern)!=length(replacement)) {
     stop("pattern and replacement do not have the same length.")
@@ -46,9 +50,9 @@ mgsub <- function(pattern, replacement, x, ...) {
   result
 }
 
-full_extract$activity<-mgsub(activity_lables$V1,activity_labels$V2,full_extract)
+full_extract$activity<-mgsub(activity_labels$V1,activity_labels$V2,full_extract)
 
-#Create the Tidy Data Set using the function Group By and Summarise_each to get the mean
+#Section 6: Create the Tidy Data Set using the function Group By and Summarise_each to get the mean
 groupby_data<-group_by(full_extract,subject,activity)
 
 #calculate the means of each meansurement.
